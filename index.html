@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SwiftCart</title>
+
+    <!-- Tailwind + DaisyUI (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+
+  <body class="min-h-screen bg-base-100">
+    <!-- NAVBAR -->
+    <header class="navbar bg-base-100 shadow sticky top-0 z-50">
+      <div class="navbar-start">
+        <a class="btn btn-ghost text-xl" href="index.html">SwiftCart</a>
+      </div>
+
+      <nav class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+          <li><a class="font-semibold" href="index.html">Home</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="navbar-end">
+        <!-- Step-7 - cart count + drawer -->
+        <button
+          id="openCartBtn"
+          class="btn btn-ghost"
+          type="button"
+          aria-label="Cart button"
+        >
+          🛒 <span id="cartCount" class="badge badge-sm badge-primary">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- HERO / BANNER -->
+    <section
+      class="hero min-h-[70vh]"
+      style="
+        background-image: url(&quot;https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=60&quot;);
+      "
+    >
+      <div class="hero-overlay bg-opacity-60"></div>
+
+      <div class="hero-content text-center text-neutral-content">
+        <div class="max-w-xl">
+          <h1 class="text-4xl md:text-5xl font-bold mb-4">
+            Best Collection for You
+          </h1>
+          <p class="opacity-90 mb-7">
+            Shop electronics, fashion, jewelry — real products powered by API
+            integration.
+          </p>
+          <a id="shopNowBtn" href="#trending" class="btn btn-primary">
+            Shop Now
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Placeholder section (Step-3  API Trending ) -->
+    <main class="max-w-6xl mx-auto px-4 py-14">
+      <h2 id="trending" class="text-3xl font-bold mb-4">Trending Products</h2>
+      <p class="opacity-70">
+        (This section will show real API products in Step-3.)
+      </p>
+    </main>
+
+    <script src="./js/app.js"></script>
+  </body>
+</html>
