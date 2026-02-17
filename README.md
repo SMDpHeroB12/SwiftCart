@@ -59,5 +59,7 @@ Scope নির্ধারণ করে একটি ভেরিয়েবল �
 ---
 
 **Author:** SHEKH MD NAYEM YOUSUF
+
 **Project:** SwiftCart
+
 **Technology:** HTML + Tailwind + Vanilla JavaScript
