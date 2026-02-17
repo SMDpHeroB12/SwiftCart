@@ -299,3 +299,76 @@ function addToCart(item) {
     await renderProducts(activeCategory);
   });
 })();
+
+// Step-6: Product Details Modal (single product API)
+(function () {
+  const modal = document.getElementById("detailsModal");
+  const content = document.getElementById("modalContent");
+
+  // Run only on products page where modal exists
+  if (!modal || !content) return;
+
+  async function openDetails(id) {
+    try {
+      content.innerHTML = `
+        <div class="flex justify-center py-10">
+          <span class="loading loading-spinner loading-lg"></span>
+        </div>
+      `;
+      modal.showModal();
+
+      const res = await fetch(`https://fakestoreapi.com/products/${id}`);
+      if (!res.ok) throw new Error("Single product fetch failed");
+      const p = await res.json();
+
+      const rating = p?.rating?.rate ?? 0;
+      const count = p?.rating?.count ?? 0;
+
+      const cartItem = {
+        id: p.id,
+        title: p.title,
+        price: p.price,
+        image: p.image,
+      };
+
+      content.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white rounded p-4">
+            <img src="${p.image}" alt="${escapeHtml(p.title)}" class="w-full h-64 object-contain" />
+          </div>
+
+          <div>
+            <h2 class="text-2xl font-bold mb-2">${escapeHtml(p.title)}</h2>
+
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="badge badge-outline">${escapeHtml(p.category)}</span>
+              <span class="badge badge-secondary">⭐ ${rating} (${count})</span>
+            </div>
+
+            <p class="text-lg font-semibold mb-3">${money(p.price)}</p>
+
+            <p class="opacity-80 mb-6">${escapeHtml(p.description)}</p>
+
+            <button class="btn btn-primary" data-add='${escapeHtml(JSON.stringify(cartItem))}'>
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      console.error("Modal Details Error:", err);
+      content.innerHTML = `
+        <div class="alert alert-error">
+          <span>Failed to load product details.</span>
+        </div>
+      `;
+    }
+  }
+
+  // Details button click (event delegation)
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-details-id]");
+    if (!btn) return;
+    openDetails(btn.getAttribute("data-details-id"));
+  });
+})();
