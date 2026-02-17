@@ -31,7 +31,7 @@
       </nav>
 
       <div class="navbar-end">
-        <!-- Step-7 - cart count + drawer -->
+        <!-- cart count + drawer -->
         <button
           id="openCartBtn"
           class="btn btn-ghost"
@@ -58,8 +58,7 @@
             Best Collection for You
           </h1>
           <p class="opacity-90 mb-7">
-            Shop electronics, fashion, jewelry — real products powered by API
-            integration.
+            Shop electronics, fashion, jewelry and more at unbeatable prices.
           </p>
           <a id="shopNowBtn" href="#trending" class="btn btn-primary">
             Shop Now
@@ -113,13 +112,31 @@
       </div>
     </section>
 
+    <!-- trending Section  -->
     <main class="max-w-6xl mx-auto px-4 py-14">
-      <h2 id="trending" class="text-3xl font-bold mb-4">Trending Products</h2>
-      <p class="opacity-70">
-        (This section will show real API products in Step-3.)
-      </p>
+      <div class="flex items-center justify-between mb-6">
+        <h2 id="trending" class="text-3xl font-bold">Trending (Top Rated)</h2>
+        <a class="btn btn-outline btn-sm" href="products.html">View All</a>
+      </div>
+
+      <!-- Spinner -->
+      <div id="trendingSpinner" class="flex justify-center py-10 hidden">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <!-- Error -->
+      <div id="trendingError" class="alert alert-error hidden">
+        <span>Failed to load trending products.</span>
+      </div>
+
+      <!-- Grid -->
+      <div
+        id="trendingGrid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"
+      ></div>
     </main>
 
+    <!-- Newsletter Section -->
     <section class="bg-base-200">
       <div class="max-w-6xl mx-auto px-4 py-14">
         <h2 class="text-3xl font-bold text-center mb-3">Newsletter</h2>

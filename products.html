@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SwiftCart - Products</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+
+  <body class="min-h-screen bg-base-100">
+    <!-- NAVBAR -->
+    <header class="navbar bg-base-100 shadow sticky top-0 z-50">
+      <div class="navbar-start">
+        <a class="btn btn-ghost text-xl" href="index.html">SwiftCart</a>
+      </div>
+
+      <nav class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+          <li><a href="index.html">Home</a></li>
+          <li><a class="font-semibold" href="products.html">Products</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="navbar-end">
+        <button class="btn btn-ghost" type="button" aria-label="Cart button">
+          🛒 <span id="cartCount" class="badge badge-primary ml-1">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE HEADER -->
+    <main class="max-w-6xl mx-auto px-4 py-10">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
+      >
+        <h1 class="text-3xl font-bold">All Products</h1>
+
+        <div class="flex gap-2">
+          <button class="btn btn-outline btn-sm" disabled>Sort</button>
+          <button class="btn btn-outline btn-sm" disabled>Search</button>
+        </div>
+      </div>
+
+      <!-- CATEGORY BAR -->
+      <section class="mb-6">
+        <h2 class="font-semibold mb-2">Categories</h2>
+        <div id="categoriesBar" class="flex flex-wrap gap-2">
+          <button class="btn btn-sm btn-primary">All</button>
+        </div>
+      </section>
+
+      <!-- LOADING SPINNER -->
+      <div id="productSpinner" class="flex justify-center py-10 hidden">
+        <span class="loading loading-spinner loading-lg"></span>
+      </div>
+
+      <!-- ERROR BOX -->
+      <div id="productError" class="alert alert-error hidden">
+        <span>Failed to load products.</span>
+      </div>
+
+      <!-- PRODUCT GRID -->
+      <section>
+        <div
+          id="productGrid"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
+    </main>
+
+    <!-- DETAILS MODAL (structure only) -->
+    <dialog id="detailsModal" class="modal">
+      <div class="modal-box max-w-3xl">
+        <form method="dialog">
+          <button
+            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >
+            ✕
+          </button>
+        </form>
+
+        <div id="modalContent">
+          <h3 class="text-xl font-bold mb-2">Product Details</h3>
+          <p class="opacity-70">Details will load in Step-6.</p>
+        </div>
+
+        <div class="modal-action">
+          <form method="dialog">
+            <button class="btn">Close</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="./js/app.js"></script>
+  </body>
+</html>
