@@ -48,68 +48,80 @@ function escapeHtml(str) {
   });
 })();
 
-/* ---------- Full Cart Drawer (localStorage + list + total + remove) ---------- */
-const CART_KEY = "swiftcart_cart";
+/* ---------- Cart with Quantity (localStorage + qty + plus/minus) ---------- */
+const CART_KEY = "swiftcart_cart_v2";
 
 function getCart() {
   return JSON.parse(localStorage.getItem(CART_KEY)) || [];
 }
+
 function setCart(cart) {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
 }
-function cartTotal(cart) {
-  const total = cart.reduce((sum, item) => sum + Number(item.price || 0), 0);
+
+function getCartCount() {
+  // total qty
+  return getCart().reduce((sum, item) => sum + (item.qty || 1), 0);
+}
+
+function getCartTotal() {
+  const total = getCart().reduce((sum, item) => {
+    const qty = item.qty || 1;
+    return sum + Number(item.price || 0) * qty;
+  }, 0);
   return Number(total.toFixed(2));
 }
 
 function updateCartCount() {
   const el = document.getElementById("cartCount");
   if (!el) return;
-  el.textContent = getCart().length;
+  el.textContent = getCartCount();
 }
 
-function renderCart() {
-  const itemsEl = document.getElementById("cartItems");
-  const totalEl = document.getElementById("cartTotal");
-  if (!itemsEl || !totalEl) return;
-
+function addToCart(product) {
   const cart = getCart();
+  const idx = cart.findIndex((x) => String(x.id) === String(product.id));
 
-  if (cart.length === 0) {
-    itemsEl.innerHTML = `<p class="opacity-70">Cart is empty.</p>`;
+  if (idx === -1) {
+    cart.push({ ...product, qty: 1 });
   } else {
-    itemsEl.innerHTML = cart
-      .map(
-        (item) => `
-      <div class="card bg-base-200">
-        <div class="card-body p-4">
-          <div class="flex gap-3 items-center">
-            <img class="w-14 h-14 object-contain bg-white rounded" src="${item.image}" alt="${escapeHtml(item.title)}" />
-            <div class="flex-1">
-              <h4 class="font-semibold text-sm">${escapeHtml(item.title.slice(0, 45))}${item.title.length > 45 ? "..." : ""}</h4>
-              <p class="text-sm opacity-80">${money(item.price)}</p>
-            </div>
-            <button class="btn btn-sm btn-error" data-remove-id="${item.id}">Remove</button>
-          </div>
-        </div>
-      </div>
-    `,
-      )
-      .join("");
+    cart[idx].qty = (cart[idx].qty || 1) + 1;
   }
 
-  totalEl.textContent = money(cartTotal(cart));
-}
-
-function addToCart(item) {
-  const cart = getCart();
-  cart.push(item);
   setCart(cart);
   updateCartCount();
   renderCart();
 }
 
-function removeFromCart(id) {
+function increaseQty(id) {
+  const cart = getCart();
+  const idx = cart.findIndex((x) => String(x.id) === String(id));
+  if (idx === -1) return;
+
+  cart[idx].qty = (cart[idx].qty || 1) + 1;
+  setCart(cart);
+  updateCartCount();
+  renderCart();
+}
+
+function decreaseQty(id) {
+  const cart = getCart();
+  const idx = cart.findIndex((x) => String(x.id) === String(id));
+  if (idx === -1) return;
+
+  const current = cart[idx].qty || 1;
+  if (current <= 1) {
+    cart.splice(idx, 1);
+  } else {
+    cart[idx].qty = current - 1;
+  }
+
+  setCart(cart);
+  updateCartCount();
+  renderCart();
+}
+
+function removeLine(id) {
   const cart = getCart().filter((x) => String(x.id) !== String(id));
   setCart(cart);
   updateCartCount();
@@ -133,7 +145,50 @@ function closeCartDrawer() {
   overlay.classList.add("hidden");
 }
 
-/* Wire cart UI + actions (runs on every page safely) */
+function renderCart() {
+  const itemsEl = document.getElementById("cartItems");
+  const totalEl = document.getElementById("cartTotal");
+  if (!itemsEl || !totalEl) return;
+
+  const cart = getCart();
+
+  if (cart.length === 0) {
+    itemsEl.innerHTML = `<p class="opacity-70">Cart is empty.</p>`;
+  } else {
+    itemsEl.innerHTML = cart
+      .map((item) => {
+        const qty = item.qty || 1;
+        const lineTotal = Number(item.price || 0) * qty;
+
+        return `
+          <div class="card bg-base-200">
+            <div class="card-body p-4">
+              <div class="flex gap-3 items-center">
+                <img class="w-14 h-14 object-contain bg-white rounded" src="${item.image}" alt="${escapeHtml(item.title)}" />
+                <div class="flex-1">
+                  <h4 class="font-semibold text-sm">${escapeHtml(item.title.slice(0, 45))}${item.title.length > 45 ? "..." : ""}</h4>
+                  <p class="text-sm opacity-80">${money(item.price)} × ${qty} = ${money(lineTotal)}</p>
+
+                  <div class="mt-2 flex items-center gap-2">
+                    <button class="btn btn-xs text-white bg-red-500" data-qty-minus="${item.id}">−</button>
+                    <span class="badge font-bold badge-neutral">${qty}</span>
+                    <button class="btn btn-xs text-white bg-blue-500" data-qty-plus="${item.id}">+</button>
+
+                    <button class="btn btn-xs btn-error ml-auto text-white " data-remove-line="${item.id}">Remove</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  totalEl.textContent = money(getCartTotal());
+}
+
+/* Wire cart UI + actions (single event delegation) */
 (function cartInit() {
   updateCartCount();
   renderCart();
@@ -148,8 +203,8 @@ function closeCartDrawer() {
     .getElementById("drawerOverlay")
     ?.addEventListener("click", closeCartDrawer);
 
-  // Add to cart (event delegation)
   document.addEventListener("click", (e) => {
+    // Add to cart buttons (cards/modal/trending)
     const addBtn = e.target.closest("[data-add]");
     if (addBtn) {
       try {
@@ -161,31 +216,29 @@ function closeCartDrawer() {
       return;
     }
 
-    const removeBtn = e.target.closest("[data-remove-id]");
+    // qty controls
+    const plusBtn = e.target.closest("[data-qty-plus]");
+    if (plusBtn) {
+      increaseQty(plusBtn.getAttribute("data-qty-plus"));
+      return;
+    }
+
+    const minusBtn = e.target.closest("[data-qty-minus]");
+    if (minusBtn) {
+      decreaseQty(minusBtn.getAttribute("data-qty-minus"));
+      return;
+    }
+
+    // remove entire line
+    const removeBtn = e.target.closest("[data-remove-line]");
     if (removeBtn) {
-      removeFromCart(removeBtn.getAttribute("data-remove-id"));
+      removeLine(removeBtn.getAttribute("data-remove-line"));
       return;
     }
   });
 })();
 
-// Global click handler for Add to Cart buttons
-(function () {
-  updateCartCount();
-
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-add]");
-    if (!btn) return;
-
-    try {
-      const item = JSON.parse(btn.getAttribute("data-add"));
-      addToCart(item);
-    } catch (err) {
-      console.error("Add to cart parse error:", err);
-    }
-  });
-})();
-
+//======================================================================================================================
 /* ---------- Trending (Top Rated) products on home page ---------- */
 (async function loadTrending() {
   const grid = document.getElementById("trendingGrid");
